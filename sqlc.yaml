@@ -1,0 +1,28 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "internal/db/queries"
+    schema: "internal/db/migrations"
+    gen:
+      go:
+        package: "sqlc"
+        out: "internal/db/sqlc"
+        sql_package: "pgx/v5"
+        emit_json_tags: true
+        emit_interface: true
+        emit_empty_slices: true
+        # NOT using emit_pointers_for_null_types — nullable columns are
+        # handled explicitly per-type below instead (uuid.NullUUID for
+        # uuid, pgtype's own null wrappers for everything else), so
+        # what sqlc generates matches what the service layer expects.
+        overrides:
+          # Every uuid column in this schema — every service and handler
+          # assumes google/uuid.UUID, not pgx's own pgtype.UUID. Without
+          # this, sqlc's default mapping breaks the whole codebase.
+          - db_type: "uuid"
+            go_type: "github.com/google/uuid.UUID"
+          - db_type: "uuid"
+            nullable: true
+            go_type:
+              type: "NullUUID"
+              import: "github.com/google/uuid"

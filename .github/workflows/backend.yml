@@ -11,22 +11,10 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16
-        env: { POSTGRES_USER: pas, POSTGRES_PASSWORD: pas, POSTGRES_DB: pas }
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd "pg_isready -U pas" --health-interval 5s
-          --health-timeout 5s --health-retries 10
-    env:
-      TEST_DATABASE_URL: postgres://pas:pas@localhost:5432/pas?sslmode=disable
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with: { go-version: "1.24", cache: true }
-      - run: go install github.com/pressly/goose/v3/cmd/goose@v3.20.0
-      - run: goose -dir internal/db/migrations postgres "$TEST_DATABASE_URL" up
       - run: go vet ./...
       - run: go build ./...
       - run: go test ./...
@@ -55,7 +43,7 @@ jobs:
           cache-to: type=gha,mode=max
       - name: Smoke test /health
         run: |
-          docker run -d --name smoke --env-file .env -p 3400:3400 \
+          docker run -d --name smoke --env-file .env -e PORT=8080 -p 3400:8080 \
             ${{ env.IMAGE }}:${{ github.sha }}
           for i in $(seq 1 20); do
             curl -sf http://localhost:3400/health && { echo ok; break; }

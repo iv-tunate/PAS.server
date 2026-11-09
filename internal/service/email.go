@@ -36,7 +36,9 @@ func paragraphs(text string) string {
 			return fmt.Sprintf(`<a href="%s" style="color:#4F4FA0">%s</a>`, u, u)
 		})
 		safe = strings.ReplaceAll(safe, "\n", "<br>")
-		out.WriteString(`<p style="margin:0 0 16px;line-height:1.65">` + safe + `</p>`)
+		out.WriteString(`<p style="margin:0 0 16px;line-height:1.65">`)
+		out.WriteString(safe)
+		out.WriteString(`</p>`)
 	}
 	return out.String()
 }

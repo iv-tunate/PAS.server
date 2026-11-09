@@ -51,6 +51,11 @@ jobs:
             sleep 2
           done
           docker rm -f smoke
+
+  render-deploy:
+    needs: build-test-deploy
+    runs-on: ubuntu-latest
+    steps:
       - name: Trigger Render deploy
         run: |
           curl -fsS "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"

@@ -37,6 +37,8 @@ var contentLimits = map[string]int{
 	"hero.first":   limitShort,
 	"hero.last":    limitShort,
 	"hero.tagline": limitLine,
+	"hero.photo":   limitURL,
+	"hero.image":   limitURL,
 
 	"about.heading":      limitLine,
 	"about.roles":        limitLine,
@@ -45,6 +47,9 @@ var contentLimits = map[string]int{
 	"about.fact.church":  limitLine,
 	"about.fact.also":    limitLine,
 	"about.fact.married": limitLine,
+	"about.photo.1":      limitURL,
+	"about.photo.2":      limitURL,
+	"about.photo.3":      limitURL,
 
 	"books.heading": limitLine,
 	"books.body":    limitPara,
@@ -67,6 +72,12 @@ var contentLimits = map[string]int{
 
 	"relearn.heading": limitLine,
 	"relearn.body":    limitPara,
+	"relearn.track.1.label": limitLine,
+	"relearn.track.1.desc":  limitLine,
+	"relearn.track.2.label": limitLine,
+	"relearn.track.2.desc":  limitLine,
+	"relearn.track.3.label": limitLine,
+	"relearn.track.3.desc":  limitLine,
 
 	"events.heading": limitLine,
 	"events.body":    limitPara,
@@ -97,7 +108,12 @@ var contentLimits = map[string]int{
 // isLinkKey is true for keys the website renders as a link or an image. Those
 // must be https addresses, so nobody can plant a "javascript:" link in the footer.
 func isLinkKey(key string) bool {
-	return strings.HasPrefix(key, "social.") || strings.HasPrefix(key, "photo.") || strings.HasPrefix(key, "church.photo.")
+	return strings.HasPrefix(key, "social.") ||
+		strings.HasPrefix(key, "photo.") ||
+		strings.HasPrefix(key, "about.photo.") ||
+		strings.HasPrefix(key, "church.photo.") ||
+		key == "hero.photo" ||
+		key == "hero.image"
 }
 
 type ContentService struct {

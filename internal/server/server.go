@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -86,8 +87,24 @@ func New(ctx context.Context, cfg *config.Config, log *slog.Logger, pool *pgxpoo
 		HSTSExcludeSubdomains: false,
 	}))
 
+	frontendClean := strings.TrimRight(cfg.FrontendURL, "/")
+	origins := []string{
+		frontendClean,
+		frontendClean + "/",
+		"http://localhost:3000",
+		"http://localhost:3001",
+	}
+	seenOrigins := make(map[string]bool)
+	var allowOrigins []string
+	for _, o := range origins {
+		if o != "" && !seenOrigins[o] {
+			seenOrigins[o] = true
+			allowOrigins = append(allowOrigins, o)
+		}
+	}
+
 	e.Use(echomw.CORSWithConfig(echomw.CORSConfig{
-		AllowOrigins: []string{cfg.FrontendURL},
+		AllowOrigins: allowOrigins,
 		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAuthorization},
 	}))
